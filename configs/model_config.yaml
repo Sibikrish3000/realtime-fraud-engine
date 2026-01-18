@@ -1,0 +1,29 @@
+# Model Training Configuration
+
+model:
+  # XGBoost Hyperparameters (Aligned with Notebook)
+  n_estimators: 500          # Notebook used 500 trees (Script had 100)
+  max_depth: 8               # Notebook used depth 8 (Script had 6)
+  learning_rate: 0.1         # Matches notebook
+  subsample: 0.8             # Row sampling for regularization
+  colsample_bytree: 0.8      # Column sampling for regularization
+  scale_pos_weight: 100      # Will be overridden by calculated imbalance ratio
+  eval_metric: "aucpr"
+  random_state: 42
+
+# Training Settings
+training:
+  test_size: 0.2
+  validation_size: 0.1
+  random_state: 42
+
+# Decision Threshold
+threshold:
+  optimal_threshold: 0.9016819596290588  # From notebook PR curve analysis
+  min_precision: 0.80  # Business requirement
+
+# Feature Engineering
+features:
+  use_cyclical_encoding: true
+  use_distance_features: true
+  use_temporal_features: true

@@ -1,0 +1,19 @@
+# Redis Feature Store Configuration
+
+# Connection Settings
+host: localhost
+port: 6379
+db: 0
+password: null  # Set via REDIS_PASSWORD env var in production
+
+# Connection Pool
+max_connections: 50
+socket_connect_timeout: 2  # seconds
+socket_timeout: 1  # seconds
+
+# Feature Store Settings
+ema_alpha: 0.08  # 2/(24+1) for 24-hour window
+key_ttl: 604800  # 7 days in seconds
+
+# Window Configuration
+sliding_window_hours: 24

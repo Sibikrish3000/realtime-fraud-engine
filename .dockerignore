@@ -1,0 +1,34 @@
+# Git and Version Control
+.git
+.gitignore
+.github
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+.venv
+.env
+.pytest_cache
+.ruff_cache
+.coverage
+htmlcov
+.ipynb_checkpoints
+
+# Project Data & Artifacts
+# models/
+logs/
+notebooks/
+data/
+*.csv
+*.parquet
+*.pkl
+# *.json
+
+# UV
+# uv.lock
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore

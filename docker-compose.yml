@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: payshield-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - payshield-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payshield-api
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MODEL_PATH=/app/models/fraud_model.pkl
+      - THRESHOLD_PATH=/app/models/threshold.json
+      - SHADOW_MODE=false
+    volumes:
+      - ./models:/app/models:ro
+      - ./logs:/app/logs
+    networks:
+      - payshield-network
+
+  # Placeholder for Phase 6 Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payshield-dashboard
+    depends_on:
+      - api
+    command: ["streamlit", "run", "src/frontend/app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000/v1/predict
+    networks:
+      - payshield-network
+    restart: unless-stopped
+
+networks:
+  payshield-network:
+    driver: bridge
+
+volumes:
+  redis_data:
