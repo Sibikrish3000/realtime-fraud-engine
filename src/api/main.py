@@ -10,7 +10,7 @@ import logging
 import time
 from pathlib import Path
 import pandas as pd
-from typing import Dict, Any, Optional
+from typing import Optional
 
 import joblib
 from fastapi import FastAPI, HTTPException
@@ -92,7 +92,7 @@ async def load_resources():
     except Exception as e:
         logger.warning(f"Redis connection failed: {e}. Feature store disabled.")
         feature_store = None
-    
+
     # Initialize SHAP Explainer
     try:
         explainer = FraudExplainer(str(model_path))
@@ -181,36 +181,43 @@ async def predict(request: PredictionRequest):
         avg_spend_24h = request.avg_spend_24h
         amt_to_avg_ratio_24h = request.amt_to_avg_ratio_24h
         user_avg_amt_all_time = request.user_avg_amt_all_time
-        
+
         # If any real-time feature is missing from overrides, try Redis
-        if (trans_count_24h is None or avg_spend_24h is None or user_avg_amt_all_time is None) and feature_store:
+        if (
+            trans_count_24h is None or avg_spend_24h is None or user_avg_amt_all_time is None
+        ) and feature_store:
             try:
                 # Uses transaction timestamp for time-based lookup
                 trans_time = pd.to_datetime(request.trans_date_trans_time)
                 timestamp = int(trans_time.timestamp())
-                
+
                 features = feature_store.get_features(request.user_id, timestamp)
-                
+
                 if trans_count_24h is None:
                     trans_count_24h = features.get("trans_count_24h", 0)
-                
+
                 if avg_spend_24h is None:
                     avg_spend_24h = features.get("avg_spend_24h", request.amt)
-                
+
                 # Note: Redis Feature Store doesn't currently track all-time average
                 # This would need to be added to the Feature Store implementation
                 # For now, we'll use avg_spend_24h as a proxy if not overridden
                 if user_avg_amt_all_time is None:
                     user_avg_amt_all_time = features.get("user_avg_amt_all_time", avg_spend_24h)
-                    
+
             except Exception as e:
-                logger.warning(f"Redis feature lookup failed: {e}. Using defaults for missing values.")
-        
+                logger.warning(
+                    f"Redis feature lookup failed: {e}. Using defaults for missing values."
+                )
+
         # Fill remaining defaults
-        if trans_count_24h is None: trans_count_24h = 0
-        if avg_spend_24h is None: avg_spend_24h = request.amt
-        if user_avg_amt_all_time is None: user_avg_amt_all_time = avg_spend_24h  # Use 24h avg as proxy
-        
+        if trans_count_24h is None:
+            trans_count_24h = 0
+        if avg_spend_24h is None:
+            avg_spend_24h = request.amt
+        if user_avg_amt_all_time is None:
+            user_avg_amt_all_time = avg_spend_24h  # Use 24h avg as proxy
+
         # Calculate derived ratio if not overridden
         if amt_to_avg_ratio_24h is None:
             amt_to_avg_ratio_24h = request.amt / avg_spend_24h if avg_spend_24h > 0 else 1.0
@@ -223,16 +230,16 @@ async def predict(request: PredictionRequest):
 
         # Step 3: Convert to DataFrame for pipeline
         df = pd.DataFrame([request_data])
-        
+
         # Step 4: Inference
         prob = pipeline.predict_proba(df)[:, 1][0]
-        
+
         # Step 5: Apply threshold
         real_decision = "BLOCK" if prob >= threshold else "APPROVE"
-        
+
         # Calculate latency
         latency_ms = (time.time() - start_time) * 1000
-        
+
         # Step 6: Shadow mode override
         final_decision = real_decision
         if settings.shadow_mode:
@@ -244,21 +251,21 @@ async def predict(request: PredictionRequest):
             )
             # But always approve in shadow mode
             final_decision = "APPROVE"
-        
+
         # Log performance warning if latency exceeds target
         if latency_ms > settings.max_latency_ms:
             logger.warning(
                 f"Latency exceeded target: {latency_ms:.2f}ms > {settings.max_latency_ms}ms"
             )
-            
+
         # Capture features used for response
         features_used = {
             "trans_count_24h": trans_count_24h,
             "avg_spend_24h": avg_spend_24h,
             "amt_to_avg_ratio_24h": amt_to_avg_ratio_24h,
-            "user_avg_amt_all_time": user_avg_amt_all_time  # Now uses real/override value
+            "user_avg_amt_all_time": user_avg_amt_all_time,  # Now uses real/override value
         }
-        
+
         # Calculate SHAP values if explainer is available
         shap_contributions = {}
         if explainer is not None and settings.enable_explainability:
@@ -266,29 +273,26 @@ async def predict(request: PredictionRequest):
                 explanation = explainer.explain_prediction(df, threshold=threshold)
                 # Get top 5 features by absolute impact
                 shap_contributions = {
-                    item["feature"]: item["impact"] 
-                    for item in explanation["top_features"]
+                    item["feature"]: item["impact"] for item in explanation["top_features"]
                 }
             except Exception as e:
                 logger.warning(f"SHAP computation failed: {e}")
-        
+
         # Persist transaction to Redis (if no overrides were used and not in shadow mode)
         # This ensures velocity features accumulate for future predictions
         if feature_store and not settings.shadow_mode:
             # Only persist if user didn't override features (to avoid polluting real data)
             no_overrides = (
-                request.trans_count_24h is None and 
-                request.avg_spend_24h is None and 
-                request.user_avg_amt_all_time is None
+                request.trans_count_24h is None
+                and request.avg_spend_24h is None
+                and request.user_avg_amt_all_time is None
             )
             if no_overrides:
                 try:
                     trans_time = pd.to_datetime(request.trans_date_trans_time)
                     timestamp = int(trans_time.timestamp())
                     feature_store.add_transaction(
-                        user_id=request.user_id,
-                        amount=request.amt,
-                        timestamp=timestamp
+                        user_id=request.user_id, amount=request.amt, timestamp=timestamp
                     )
                 except Exception as e:
                     logger.warning(f"Failed to persist transaction to Redis: {e}")
@@ -300,7 +304,7 @@ async def predict(request: PredictionRequest):
             latency_ms=latency_ms,
             shadow_mode=settings.shadow_mode,
             features=features_used,
-            shap_values=shap_contributions
+            shap_values=shap_contributions,
         )
 
     except Exception as e:

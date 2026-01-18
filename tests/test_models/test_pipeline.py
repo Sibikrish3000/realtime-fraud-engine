@@ -6,7 +6,6 @@ Tests the pipeline construction and feature extraction logic.
 
 import numpy as np
 import pandas as pd
-import pytest
 from sklearn.base import BaseEstimator
 
 from src.models.pipeline import FraudFeatureExtractor, create_fraud_pipeline

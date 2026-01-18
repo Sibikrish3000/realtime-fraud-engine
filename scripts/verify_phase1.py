@@ -10,7 +10,7 @@ def test_imports():
     print("Testing imports...")
 
     try:
-        from src.data.ingest import TransactionSchema, InferenceTransactionSchema, load_dataset
+        from src.data.ingest import TransactionSchema, InferenceTransactionSchema, load_dataset  # noqa: F401
 
         print("  ✓ Data ingestion module imports successfully")
     except ImportError as e:
@@ -18,7 +18,7 @@ def test_imports():
         return False
 
     try:
-        from src.features.store import RedisFeatureStore
+        from src.features.store import RedisFeatureStore  # noqa: F401
 
         print("  ✓ Feature store module imports successfully")
     except ImportError as e:

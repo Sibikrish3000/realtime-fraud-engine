@@ -1,6 +1,7 @@
 # 🛡️ PayShield-ML:Real-Time Fraud Engine
 
 ![Banner](assets/banner_0.jpeg)
+
 ![Python](https://img.shields.io/badge/python-3.12-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688.svg)
 ![Redis](https://img.shields.io/badge/redis-7.0+-DC382D.svg)
@@ -8,6 +9,11 @@
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg)
 
 **A production-grade MLOps system providing low-latency fraud detection with stateful feature hydration and human-in-the-loop explainability.**
+
+[![HuggingFace Demo](https://img.shields.io/badge/Demo-white?style=flat&logo=huggingface&logoSize=amd&label=Huggingface&color=FFD21E)
+](https://sibikrish-payshield-ml.hf.space/)
+
+[![Kaggle Notebook](https://img.shields.io/badge/Kaggle-Notebook-20BEFF?logo=kaggle&logoSize=amd)](https://www.kaggle.com/code/sibikrish3000/credit-card-fraud-detection)
 
 ---
 

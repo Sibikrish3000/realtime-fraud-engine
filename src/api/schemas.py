@@ -4,7 +4,7 @@ API Request/Response Schemas.
 Pydantic models for API contract validation.
 """
 
-from typing import Literal, Optional, List, Dict, Any
+from typing import Literal, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
 

@@ -187,9 +187,9 @@ class TestFraudExplainer:
 
         # This should not raise ValueError
         try:
-            waterfall = explainer.generate_waterfall(sample_transaction)
-            summary = explainer.generate_summary(sample_transaction)
-            explanation = explainer.explain_prediction(sample_transaction)
+            explainer.generate_waterfall(sample_transaction)
+            explainer.generate_summary(sample_transaction)
+            explainer.explain_prediction(sample_transaction)
         except ValueError as e:
             pytest.fail(f"Unexpected ValueError raised: {e}")
 

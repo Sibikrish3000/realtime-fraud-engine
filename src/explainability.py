@@ -13,7 +13,7 @@ Based on research notebook SHAP implementation:
 import base64
 import io
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Tuple, Union
 
 import joblib
 import matplotlib

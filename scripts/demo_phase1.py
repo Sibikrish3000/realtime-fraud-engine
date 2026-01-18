@@ -4,7 +4,7 @@ Example script demonstrating the data ingestion and feature store usage.
 This shows how to use the modules we just built.
 """
 
-from src.data.ingest import load_dataset, InferenceTransactionSchema
+from src.data.ingest import InferenceTransactionSchema
 from src.features.store import RedisFeatureStore
 
 
@@ -57,7 +57,7 @@ def main():
 
         # Get features
         features = store.get_features(user_id, current_timestamp=base_time + 7200)
-        print(f"\n   Features computed:")
+        print("\n   Features computed:")
         print(f"      - Transaction count (24h): {features['trans_count_24h']:.0f}")
         print(f"      - Average spend (24h): ${features['avg_spend_24h']:.2f}")
 

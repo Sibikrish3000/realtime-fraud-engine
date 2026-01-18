@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Literal, Optional, Union
 
 import pandas as pd
-import pyarrow.parquet as pq
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from src.features.constants import category_names, job_names

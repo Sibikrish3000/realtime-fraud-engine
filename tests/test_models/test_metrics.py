@@ -5,7 +5,6 @@ Tests threshold optimization and metric calculation logic.
 """
 
 import numpy as np
-import pytest
 
 from src.models.metrics import calculate_metrics, find_optimal_threshold
 
@@ -47,7 +46,6 @@ class TestFindOptimalThreshold:
         """Test that threshold meets recall requirement."""
         # Create imbalanced dataset (like fraud)
         np.random.seed(42)
-        n_samples = 1000
 
         # 95% negative, 5% positive
         y_true = np.array([0] * 950 + [1] * 50)

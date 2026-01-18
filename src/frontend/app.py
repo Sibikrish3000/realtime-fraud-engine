@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import requests
 import plotly.graph_objects as ob
-import json
 from datetime import datetime, time
 import plotly.express as px
 from src.features.constants import category_names, job_names

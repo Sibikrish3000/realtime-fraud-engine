@@ -4,11 +4,8 @@ Tests for Redis Feature Store
 Tests sliding window logic, EMA computation, and Redis operations.
 """
 
-import time
 
-import pytest
 
-from src.features.store import RedisFeatureStore
 
 
 class TestRedisFeatureStore:

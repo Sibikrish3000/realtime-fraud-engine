@@ -12,7 +12,7 @@ Derived from notebook analysis:
 - Geo: Haversine distance
 """
 
-from typing import Dict, List, Optional, Union
+from typing import Dict
 
 import numpy as np
 import pandas as pd

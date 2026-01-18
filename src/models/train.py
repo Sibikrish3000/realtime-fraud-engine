@@ -11,17 +11,14 @@ Usage:
 
 import argparse
 import json
-import os
 from pathlib import Path
 from typing import Dict, Tuple
 
 import joblib
 import mlflow
 import mlflow.sklearn
-import numpy as np
 import pandas as pd
 import yaml
-from sklearn.model_selection import train_test_split
 
 from src.data.ingest import load_dataset
 from src.models.metrics import calculate_metrics, find_optimal_threshold
@@ -104,22 +101,6 @@ def prepare_data(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
     Returns:
         Tuple of (X, y)
     """
-    # Required columns for training
-    required_cols = [
-        "trans_date_trans_time",
-        "amt",
-        "lat",
-        "long",
-        "merch_lat",
-        "merch_long",
-        "job",
-        "category",
-        "gender",
-        "dob",
-        "is_fraud",
-    ]
-
-    # Compute feature store features from raw data
     # Sort by user and timestamp for rolling window calculations
     print("  → Computing rolling window features (trans_count_24h, avg_amt_24h)...")
 
@@ -198,7 +179,7 @@ def train_model(args):
     print(f"  → Fraud rate: {df['is_fraud'].mean() * 100:.2f}%")
 
     # 3. Prepare Features
-    print(f"\n[3/7] Preparing features and target")
+    print("\n[3/7] Preparing features and target")
     X, y = prepare_data(df)
     print(f"  → Features shape: {X.shape}")
     print(f"  → Target shape: {y.shape}")
@@ -259,7 +240,7 @@ def train_model(args):
         mlflow.log_param("n_test_samples", len(X_test))
 
         # 6. Train Pipeline
-        print(f"\n[6/7] Training pipeline")
+        print("\n[6/7] Training pipeline")
         pipeline = create_fraud_pipeline(model_params)
 
         print("  → Fitting model...")

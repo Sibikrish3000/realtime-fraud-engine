@@ -5,7 +5,6 @@ Utilities for calculating custom performance metrics and optimizing thresholds.
 """
 
 import json
-from pathlib import Path
 from typing import Dict, Tuple
 
 import numpy as np
