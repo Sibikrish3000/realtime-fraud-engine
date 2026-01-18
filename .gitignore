@@ -15,4 +15,4 @@ wheels/
 .vscode
 mlruns/
 notebook/dataset/*.csv
-.agent
+.agent/*

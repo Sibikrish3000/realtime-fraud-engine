@@ -236,7 +236,7 @@ class RedisFeatureStore:
         }
 
     def get_transaction_history(
-        self, user_id: str, lookback_hours: int = 24
+        self, user_id: str, lookback_hours: int = 24, current_timestamp: Optional[int] = None
     ) -> List[Tuple[int, float]]:
         """
         Retrieve raw transaction history for a user.
@@ -246,6 +246,7 @@ class RedisFeatureStore:
         Args:
             user_id: User identifier
             lookback_hours: How many hours of history to retrieve
+            current_timestamp: Reference timestamp. If None, uses system time.
 
         Returns:
             List of tuples: [(timestamp, amount), ...]
@@ -256,14 +257,18 @@ class RedisFeatureStore:
             >>> for ts, amt in history:
             ...     print(f"{ts}: ${amt:.2f}")
         """
-        current_time = int(time.time())
-        window_start = current_time - (lookback_hours * 3600)
+        if current_timestamp is None:
+            current_timestamp = int(time.time())
+
+        window_start = current_timestamp - (lookback_hours * 3600)
 
         tx_key = self._get_tx_history_key(user_id)
 
         # Get all transactions in window with scores (timestamps)
         # ZRANGEBYSCORE with WITHSCORES
-        raw_results = self.client.zrangebyscore(tx_key, window_start, current_time, withscores=True)
+        raw_results = self.client.zrangebyscore(
+            tx_key, window_start, current_timestamp, withscores=True
+        )
 
         # Parse results: member format is "timestamp:amount"
         transactions = []

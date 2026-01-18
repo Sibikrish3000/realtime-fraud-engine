@@ -2,7 +2,6 @@
 Integration tests for FastAPI inference service.
 """
 
-
 import pytest
 from fastapi.testclient import TestClient
 

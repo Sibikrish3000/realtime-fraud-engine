@@ -35,7 +35,7 @@ class PredictionRequest(BaseModel):
     avg_spend_24h: Optional[float] = None
     amt_to_avg_ratio_24h: Optional[float] = None
     user_avg_amt_all_time: Optional[float] = None
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -63,8 +63,12 @@ class PredictionResponse(BaseModel):
     risk_score: float = Field(..., ge=0, le=100, description="Risk score (0-100)")
     latency_ms: float = Field(..., description="Inference latency in milliseconds")
     shadow_mode: bool = Field(default=False, description="Whether shadow mode is active")
-    features: Dict[str, Any] = Field(default_factory=dict, description="Features used for inference")
-    shap_values: Dict[str, float] = Field(default_factory=dict, description="SHAP feature contributions")
+    features: Dict[str, Any] = Field(
+        default_factory=dict, description="Features used for inference"
+    )
+    shap_values: Dict[str, float] = Field(
+        default_factory=dict, description="SHAP feature contributions"
+    )
 
     class Config:
         json_schema_extra = {

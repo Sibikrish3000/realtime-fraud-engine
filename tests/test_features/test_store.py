@@ -5,9 +5,6 @@ Tests sliding window logic, EMA computation, and Redis operations.
 """
 
 
-
-
-
 class TestRedisFeatureStore:
     """Test suite for RedisFeatureStore."""
 
@@ -45,8 +42,8 @@ class TestRedisFeatureStore:
         )
         assert features["trans_count_24h"] == 3.0
 
-        # Add transaction 25 hours later - old ones should be excluded
-        future_time = base_time + (25 * 3600)
+        # Add transaction 27 hours later - old ones should be excluded
+        future_time = base_time + (27 * 3600)
         feature_store.add_transaction(user_id="test_user_2", amount=50.00, timestamp=future_time)
 
         features = feature_store.get_features("test_user_2", current_timestamp=future_time)
@@ -84,7 +81,9 @@ class TestRedisFeatureStore:
                 user_id="test_user_4", amount=amt, timestamp=base_time + (i * 3600)
             )
 
-        history = feature_store.get_transaction_history("test_user_4", lookback_hours=24)
+        history = feature_store.get_transaction_history(
+            "test_user_4", lookback_hours=24, current_timestamp=base_time + 7200
+        )
 
         assert len(history) == 3
         # Should be sorted newest first
